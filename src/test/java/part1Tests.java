@@ -11,7 +11,7 @@ public class part1Tests {
     // with one empty col and row this time
     @Test
     void simplestGalaxy2(){
-        Assertions.assertEquals(6, Main.runDay11Code("src/main/resources/testInputs/simplestGalaxy2.txt", 2));
+        Assertions.assertEquals(6, Main.runDay11Code("src/main/resources/testInputs/simplestGalaxy2.txt", 1000000));
     }
     //more realistic
     @Test
@@ -20,6 +20,6 @@ public class part1Tests {
     }
     @Test
     void exampleP1(){
-        Assertions.assertEquals(1030, Main.runDay11Code("src/main/resources/example1.txt", 1000000));
+        Assertions.assertEquals(8410, Main.runDay11Code("src/main/resources/example1.txt", 100));
     }
 }

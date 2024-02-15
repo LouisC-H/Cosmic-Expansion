@@ -10,11 +10,8 @@ public class SpaceMap {
     private int expansionCoefficient;
     private final int[][] spaceMatrix;
 
-    private  int expandedRowCount;
-    private  int expandedColCount;
     private ArrayList<Integer> emptyRowPositions = new ArrayList<>();
     private ArrayList<Integer> emptyColPositions = new ArrayList<>();
-    private int[][] expandedMatrix;
 
     private ArrayList<int[]> galaxiesPositions = new ArrayList<>();
 
@@ -50,47 +47,56 @@ public class SpaceMap {
                 emptyColPositions.add(j);
             }
         }
-        repopulateSpace();
-    }
-
-    private void repopulateSpace() {
-        // If the row had been empty, all rows from now on are shifted one extra row down
-        int rowOffset = 0;
-        for (int i = 0; i < rowCount; i++) {
-            if (emptyRowPositions.contains(i)){
-                rowOffset+= expansionCoefficient;
-            }
-            // If the column had been empty, all column from now on are shifted one extra column right
-                int colOffset = 0;
-                for (int j = 0; j < colCount; j++) {
-                    if (emptyColPositions.contains(j)){
-                        colOffset+= expansionCoefficient;
-                    }
-                    expandedMatrix[i + rowOffset][j + colOffset] = spaceMatrix[i][j];
-                }
-        }
     }
 
     private void getGalaxyPositions(){
-        for (int i = 0; i < expandedRowCount; i++) {
-            for (int j = 0; j < expandedColCount; j++) {
-                if (expandedMatrix[i][j] == 1){
+        for (int i = 0; i < rowCount; i++) {
+            for (int j = 0; j < colCount; j++) {
+                if (spaceMatrix[i][j] == 1){
                     this.galaxiesPositions.add(new int[]{i,j});
                 }
             }
         }
     }
 
-    public int getSumGalaxiesDistance(){
+    public long getSumGalaxiesDistance(){
         getGalaxyPositions();
-        int rollingSum = 0;
+        long rollingSum = 0;
         for (int i = 0; i < galaxiesPositions.size(); i++) {
-            for (int j = i; j < galaxiesPositions.size(); j++) {
-                rollingSum += Math.abs(galaxiesPositions.get(i)[0]-galaxiesPositions.get(j)[0]);
-                rollingSum += Math.abs(galaxiesPositions.get(i)[1]-galaxiesPositions.get(j)[1]);
+            for (int j = i + 1; j < galaxiesPositions.size(); j++) {
+                rollingSum += getVerticalDistance(galaxiesPositions.get(i)[0], galaxiesPositions.get(j)[0]);
+                rollingSum += getHorizontalDistance(galaxiesPositions.get(i)[1], galaxiesPositions.get(j)[1]);
             }
         }
         return rollingSum;
+    }
+
+    private long getVerticalDistance(int pos1, int pos2) {
+        int originalDistance = Math.abs(pos1 - pos2);
+
+        int numEmptyRows = 0;
+        for (int rowNum :
+                emptyRowPositions) {
+            // if rowNum is bigger than one and smaller than the other, it is between the two
+            if ( pos1 < rowNum ^ pos2 < rowNum ){
+                numEmptyRows++;
+            }
+        }
+        return originalDistance + (long) numEmptyRows * expansionCoefficient;
+    }
+
+    private long getHorizontalDistance(int pos1, int pos2) {
+        int originalDistance = Math.abs(pos1 - pos2);
+
+        int numEmptyCols = 0;
+        for (int colNum :
+                emptyColPositions) {
+            // if colNum is bigger than one and smaller than the other, it is between the two
+            if ( pos1 < colNum ^  pos2 < colNum ){
+                numEmptyCols++;
+            }
+        }
+        return originalDistance + (long) numEmptyCols * expansionCoefficient;
     }
 
 
@@ -101,14 +107,9 @@ public class SpaceMap {
 
     private boolean isColEmpty(int[][] spaceMatrix, int j) {
         int colSum = 0;
-        for (int i = 0; i < spaceMatrix.length; i++) {
-            colSum += spaceMatrix[i][j];
+        for (int[] matrix : spaceMatrix) {
+            colSum += matrix[j];
         }
         return colSum == 0;
-    }
-
-    // Getters and Setters
-    public int[][] getSpaceMatrix() {
-        return spaceMatrix;
     }
 }
